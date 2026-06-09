@@ -24,28 +24,50 @@ export default function Login() {
 
   // Initialize Google Sign-in button
   useEffect(() => {
-    const initGoogle = () => {
+    let resizeTimer;
+
+    const renderGoogleBtn = () => {
       if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "mock-google-client-id",
-          callback: handleGoogleLogin,
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById("google-signin-btn"),
-          { theme: "filled_blue", size: "large", width: "380", text: "signin_with" }
-        );
+        const btnContainer = document.getElementById("google-signin-btn");
+        if (btnContainer) {
+          const parentWidth = btnContainer.parentElement?.clientWidth || 380;
+          // Google's button API restricts width between 200px and 400px
+          const btnWidth = Math.max(200, Math.min(parentWidth, 400));
+
+          window.google.accounts.id.initialize({
+            client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || "mock-google-client-id",
+            callback: handleGoogleLogin,
+          });
+          window.google.accounts.id.renderButton(
+            btnContainer,
+            { theme: "filled_blue", size: "large", width: String(btnWidth), text: "signin_with" }
+          );
+        }
       }
     };
 
     // Retry checking if google script is loaded
     const interval = setInterval(() => {
       if (window.google) {
-        initGoogle();
+        renderGoogleBtn();
         clearInterval(interval);
       }
     }, 500);
 
-    return () => clearInterval(interval);
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        renderGoogleBtn();
+      }, 200);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimer);
+    };
   }, []);
 
   const handleGoogleLogin = async (response) => {
@@ -85,7 +107,7 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-b from-[#050d1f] to-[#020617] flex items-center justify-center px-6 text-white">
       <div
         ref={cardRef}
-        className="w-full max-w-md bg-[#0f172a] border border-gray-700 rounded-2xl p-10 shadow-2xl m-26"
+        className="w-full max-w-md bg-[#0f172a] border border-gray-700 rounded-2xl p-6 sm:p-10 shadow-2xl my-8 mx-4"
       >
         {/* Title */}
         <div className="text-center mb-8">
