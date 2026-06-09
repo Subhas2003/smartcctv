@@ -30,8 +30,32 @@ app.use(helmet({
 
 // CORS Configuration
 const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+const allowedOrigins = [
+  frontendUrl,
+  frontendUrl.replace(/\/$/, ""), // Remove trailing slash if present
+  "http://127.0.0.1:5173",
+  "http://localhost:5173"
+];
+
 app.use(cors({
-  origin: [frontendUrl, "http://127.0.0.1:5173", "http://localhost:5173"],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, or postman)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is explicitly allowed
+    if (allowedOrigins.includes(origin) || allowedOrigins.includes(origin + "/")) {
+      return callback(null, true);
+    }
+    
+    // Fallback: Dynamically allow any netlify.app or vercel.app subdomain for deployment flexibility
+    const isDeployDomain = origin.endsWith("netlify.app") || origin.endsWith("vercel.app") || 
+                           origin.includes(".netlify.app") || origin.includes(".vercel.app");
+    if (isDeployDomain) {
+      return callback(null, true);
+    }
+    
+    return callback(new Error("Not allowed by CORS"), false);
+  },
   credentials: true,
 }));
 
