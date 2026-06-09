@@ -54,12 +54,16 @@ export const registerUser = async (req, res, next) => {
     });
 
     console.log(`[TESTING] Verification OTP for ${user.email}: ${rawOtp}`);
-    const emailResult = await sendVerificationEmail(user.email, rawOtp);
+    
+    // Send email in the background without blocking the HTTP response
+    sendVerificationEmail(user.email, rawOtp).catch((err) => {
+      console.error(`Error sending verification email to ${user.email} in background:`, err);
+    });
 
     res.status(201).json({
       message: "Verification code sent. Please verify your email before logging in.",
       email: user.email,
-      previewUrl: emailResult?.previewUrl || null,
+      previewUrl: null,
     });
   } catch (error) {
     next(error);
@@ -205,11 +209,14 @@ export const forgotPassword = async (req, res, next) => {
     // Send email
     const resetUrl = `${process.env.FRONTEND_URL || "http://localhost:5173"}/reset-password?token=${resetToken}`;
     
-    const emailResult = await sendResetEmail(user.email, resetUrl);
+    // Send email in the background without blocking the HTTP response
+    sendResetEmail(user.email, resetUrl).catch((err) => {
+      console.error(`Error sending reset email to ${user.email} in background:`, err);
+    });
 
     res.json({
       message: "Reset link sent successfully.",
-      previewUrl: emailResult?.previewUrl || null,
+      previewUrl: null,
     });
   } catch (error) {
     next(error);
@@ -355,11 +362,15 @@ export const resendVerification = async (req, res, next) => {
     await user.save();
 
     console.log(`[TESTING] Resent Verification OTP for ${user.email}: ${rawOtp}`);
-    const emailResult = await sendVerificationEmail(user.email, rawOtp);
+    
+    // Send email in the background without blocking the HTTP response
+    sendVerificationEmail(user.email, rawOtp).catch((err) => {
+      console.error(`Error sending verification email to ${user.email} in background:`, err);
+    });
 
     res.json({
       message: "Verification code resent successfully.",
-      previewUrl: emailResult?.previewUrl || null,
+      previewUrl: null,
     });
   } catch (error) {
     next(error);
