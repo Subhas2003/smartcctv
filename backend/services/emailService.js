@@ -38,7 +38,7 @@ export const sendResetEmail = async (email, resetUrl) => {
   try {
     const tx = await getTransporter();
     const mailOptions = {
-      from: `"Smart CCTV System" <noreply@smartcctv.me>`,
+      from: `"Smart CCTV System" <${process.env.SMTP_USER}>`,
       to: email,
       subject: "Password Reset Request",
       html: `
@@ -75,7 +75,7 @@ export const sendVerificationEmail = async (email, otp) => {
   try {
     const tx = await getTransporter();
     const mailOptions = {
-      from: `"Smart CCTV System" <noreply@smartcctv.me>`,
+      from: `"Smart CCTV System" <${process.env.SMTP_USER}>`,
       to: email,
       subject: "Email Verification Code",
       html: `
