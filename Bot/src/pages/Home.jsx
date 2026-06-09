@@ -2,7 +2,7 @@ import { useEffect, useRef, useContext } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import ComponentCarousel from "../components/ComponentCarousel";
-import botVideo from "../assets/video/bot.mp4";
+// import botVideo from "../assets/video/bot.mp4";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Home() {
@@ -87,8 +87,8 @@ export default function Home() {
           <div className="flex justify-center mt-8 md:mt-0">
             <div className="w-[260px] h-[260px] sm:w-[320px] sm:h-[320px] md:w-[420px] md:h-[420px] rounded-full bg-gradient-to-br from-cyan-500/30 to-blue-500/20 flex items-center justify-center shadow-2xl border border-gray-700">
               <div className="w-[85%] h-[85%] rounded-full overflow-hidden border border-gray-600">
-                <video
-                  src={botVideo}
+                <img
+                  src=''
                   muted
                   autoPlay
                   loop
