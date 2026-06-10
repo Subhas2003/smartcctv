@@ -118,32 +118,6 @@ External Integrations:
 
 ---
 
-## Project Structure
-
-Frontend/
-├── src/
-├── components/
-├── pages/
-├── services/
-└── App.jsx
-
-Backend/
-├── controllers/
-├── models/
-├── routes/
-├── middleware/
-├── services/
-├── config/
-└── server.js
-
-RaspberryPi/
-├── main.py
-├── fire_detection.py
-├── models/
-└── camera_stream/
-
----
-
 ## Installation
 
 ### Backend
