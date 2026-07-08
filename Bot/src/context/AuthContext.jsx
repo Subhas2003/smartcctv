@@ -57,6 +57,10 @@ export const AuthProvider = ({ children }) => {
       throw new Error(data.message || "Failed to sign in");
     }
 
+    if (data.requiresOtp) {
+      return data;
+    }
+
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data);
@@ -99,6 +103,30 @@ export const AuthProvider = ({ children }) => {
       throw new Error(data.message || "Failed Google Sign-In");
     }
 
+    if (data.requiresOtp) {
+      return data;
+    }
+
+    localStorage.setItem("token", data.token);
+    setToken(data.token);
+    setUser(data);
+    return data;
+  };
+
+  const verifyOtp = async (email, code) => {
+    const res = await fetch(`${API_URL}/auth/verify-otp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, code }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.message || "Verification failed");
+    }
+
     localStorage.setItem("token", data.token);
     setToken(data.token);
     setUser(data);
@@ -120,6 +148,7 @@ export const AuthProvider = ({ children }) => {
         login,
         signup,
         loginWithGoogle,
+        verifyOtp,
         logout,
       }}
     >

@@ -33,10 +33,11 @@ export default function CameraFeed({ url, onLoaded, onError }) {
 
   return (
     <div ref={wrapperRef} className="relative w-full">
+
       {/* Fullscreen Button */}
       <button
         onClick={toggleFullscreen}
-        className="absolute top-3 right-3 z-20 bg-black/70 hover:bg-black text-white text-xs md:text-sm px-3 py-1 rounded-lg"
+        className="absolute top-3 right-3 z-20 bg-white/80 backdrop-blur-sm border border-white/40 hover:bg-white text-slate-800 text-xs md:text-sm px-3 py-1 rounded-lg shadow-md transition cursor-pointer"
       >
         {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
       </button>
@@ -46,10 +47,11 @@ export default function CameraFeed({ url, onLoaded, onError }) {
         ref={feedRef}
         src={url}
         alt="Live Camera Stream"
-        className="w-full max-h-[70vh] md:max-h-[80vh] object-contain rounded-xl border border-gray-700 shadow-lg"
+        className="w-full max-h-[70vh] md:max-h-[80vh] object-contain rounded-xl border border-white/40 shadow-xl bg-white/20 backdrop-blur-sm"
         onLoad={onLoaded}
         onError={onError}
       />
+
     </div>
   );
 }

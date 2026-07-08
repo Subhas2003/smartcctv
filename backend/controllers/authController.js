@@ -63,6 +63,7 @@ export const registerUser = async (req, res, next) => {
     res.status(201).json({
       message: "Verification code sent. Please verify your email before logging in.",
       email: user.email,
+      requiresOtp: true,
       previewUrl: null,
     });
   } catch (error) {
@@ -87,17 +88,26 @@ export const loginUser = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    if (!user.isVerified) {
-      return res.status(401).json({ message: "Please verify your email before logging in." });
-    }
+    // Generate secure 6-digit verification code (OTP)
+    const rawOtp = crypto.randomInt(100000, 1000000).toString();
+    const hashedOtp = crypto.createHash("sha256").update(rawOtp).digest("hex");
+    const otpExpires = Date.now() + 15 * 60000; // 15 Minutes
 
-    const token = signToken({ id: user._id });
+    user.verificationOtp = hashedOtp;
+    user.verificationOtpExpires = otpExpires;
+    user.lastVerificationOtpSentAt = Date.now();
+    await user.save();
+
+    console.log(`[TESTING] Login OTP for ${user.email}: ${rawOtp}`);
+
+    // Send email in the background
+    sendVerificationEmail(user.email, rawOtp).catch((err) => {
+      console.error(`Error sending login OTP to ${user.email} in background:`, err);
+    });
 
     res.json({
-      _id: user._id,
-      name: user.name,
+      requiresOtp: true,
       email: user.email,
-      token,
     });
   } catch (error) {
     next(error);
@@ -151,7 +161,7 @@ export const googleLogin = async (req, res, next) => {
         name: name || email.split("@")[0],
         email,
         googleId: sub,
-        isVerified: true,
+        isVerified: false, // User is inactive until OTP verification succeeds
       });
     } else {
       let needsSave = false;
@@ -159,22 +169,31 @@ export const googleLogin = async (req, res, next) => {
         user.googleId = sub;
         needsSave = true;
       }
-      if (!user.isVerified) {
-        user.isVerified = true;
-        needsSave = true;
-      }
       if (needsSave) {
         await user.save();
       }
     }
 
-    const token = signToken({ id: user._id });
+    // Generate secure 6-digit verification code (OTP) for login/signup attempt
+    const rawOtp = crypto.randomInt(100000, 1000000).toString();
+    const hashedOtp = crypto.createHash("sha256").update(rawOtp).digest("hex");
+    const otpExpires = Date.now() + 15 * 60000; // 15 Minutes
+
+    user.verificationOtp = hashedOtp;
+    user.verificationOtpExpires = otpExpires;
+    user.lastVerificationOtpSentAt = Date.now();
+    await user.save();
+
+    console.log(`[TESTING] Google Login OTP for ${user.email}: ${rawOtp}`);
+
+    // Send email in the background
+    sendVerificationEmail(user.email, rawOtp).catch((err) => {
+      console.error(`Error sending Google Login OTP to ${user.email} in background:`, err);
+    });
 
     res.json({
-      _id: user._id,
-      name: user.name,
+      requiresOtp: true,
       email: user.email,
-      token,
     });
   } catch (error) {
     next(error);
@@ -278,28 +297,20 @@ export const getProfile = async (req, res, next) => {
   }
 };
 
-// @desc    Verify email OTP code
-// @route   POST /api/auth/verify-email
+// @desc    Verify OTP code (Signup & Login)
+// @route   POST /api/auth/verify-otp
 // @access  Public
-export const verifyEmail = async (req, res, next) => {
+export const verifyOtp = async (req, res, next) => {
   try {
     const { email, code } = req.body;
 
     if (!email || !code) {
-      return res.status(400).json({ message: "Email and verification code are required" });
+      return res.status(400).json({ message: "Email and code are required" });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid verification request" });
-    }
-
-    // Prevent duplicate verification / already verified checks
-    if (user.isVerified) {
-      user.verificationOtp = null;
-      user.verificationOtpExpires = null;
-      await user.save();
-      return res.status(400).json({ message: "Email is already verified." });
     }
 
     // Verify OTP code
@@ -319,16 +330,26 @@ export const verifyEmail = async (req, res, next) => {
     user.verificationOtpExpires = null;
     await user.save();
 
-    res.json({ message: "Email verified successfully. You can now login." });
+    // Generate JWT and log them in
+    const token = signToken({ id: user._id });
+    res.cookie("token", token);
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token,
+      message: "Verification successful!"
+    });
   } catch (error) {
     next(error);
   }
 };
 
-// @desc    Resend verification email code
-// @route   POST /api/auth/resend-verification
+// @desc    Resend OTP code (Signup & Login)
+// @route   POST /api/auth/resend-otp
 // @access  Public
-export const resendVerification = async (req, res, next) => {
+export const resendOtp = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -338,10 +359,6 @@ export const resendVerification = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: "No user found with this email address" });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({ message: "This email is already verified." });
     }
 
     // Prevent resend abuse: enforce 60-second limit
@@ -361,7 +378,7 @@ export const resendVerification = async (req, res, next) => {
 
     await user.save();
 
-    console.log(`[TESTING] Resent Verification OTP for ${user.email}: ${rawOtp}`);
+    console.log(`[TESTING] Resent OTP for ${user.email}: ${rawOtp}`);
     
     // Send email in the background without blocking the HTTP response
     sendVerificationEmail(user.email, rawOtp).catch((err) => {
@@ -376,4 +393,8 @@ export const resendVerification = async (req, res, next) => {
     next(error);
   }
 };
+
+// Backward compatibility mappings
+export const verifyEmail = verifyOtp;
+export const resendVerification = resendOtp;
 

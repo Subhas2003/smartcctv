@@ -6,16 +6,21 @@ import { AuthContext } from "../context/AuthContext";
 export default function Navbar() {
   const navRef = useRef(null);
   const menuRef = useRef(null);
+
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const { token, user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    gsap.from(navRef.current, { y: -40, opacity: 0, duration: 1 });
+    gsap.from(navRef.current, {
+      y: -40,
+      opacity: 0,
+      duration: 1,
+    });
   }, []);
 
-  // slide animation for mobile menu
   useEffect(() => {
     if (open) {
       gsap.to(menuRef.current, {
@@ -41,54 +46,89 @@ export default function Navbar() {
     navigate("/login");
   };
 
-  const linkStyle = ({ isActive }) =>
-    `block py-3 px-4 text-base md:text-sm font-semibold transition ${
-      isActive ? "text-cyan-400" : "text-white hover:text-cyan-300"
-    }`;
-
   const getAvatarLetter = () => {
-    if (user && user.name) return user.name[0].toUpperCase();
-    if (user && user.email) return user.email[0].toUpperCase();
+    if (user?.name) return user.name[0].toUpperCase();
+    if (user?.email) return user.email[0].toUpperCase();
     return "U";
   };
+
+  const linkStyle = ({ isActive }) =>
+    `block py-3 px-4 text-base md:text-lg font-semibold transition ${isActive
+      ? "text-white"
+      : "text-black hover:text-slate-700 hover:underline"
+    }`;
 
   return (
     <nav
       ref={navRef}
-      className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 text-white border-b border-white/10 bg-slate-950/60  z-[100]"
-      
+      className="fixed top-0 left-0 w-full flex justify-between items-center px-6 md:px-12 py-4 bg-[#A9AAF7] z-[100]"
     >
-      {/* LEFT LOGO */}
-      <NavLink to="/" className="text-xl text-cyan-400 font-bold tracking-wider hover:text-cyan-300 transition">
-        SmartCCTV
-      </NavLink>
+      {/* LOGO SECTION */}
+      <div className="flex items-center gap-3">
+        <NavLink to="/">
+          <img
+            src="/image/botImage.png"
+            alt="Logo"
+            className="w-14 h-14 object-contain"
+          />
+        </NavLink>
+        <NavLink to="/">
+          <img
+            src="/image/bot.png"
+            alt="AI Watch Patrol"
+            className="w-64 h-12 object-contain"
+          />
+        </NavLink>
+
+      </div>
 
       {/* DESKTOP MENU */}
       <div className="hidden md:flex items-center space-x-4">
-        <NavLink to="/" className={linkStyle}>Home</NavLink>
-        {token && <NavLink to="/camera" className={linkStyle}>Dashboard</NavLink>}
-        {token && <NavLink to="/recordings" className={linkStyle}>Recordings</NavLink>}
-        {token && <NavLink to="/alerts" className={linkStyle}>Alerts</NavLink>}
-        <NavLink to="/about" className={linkStyle}>About</NavLink>
+        <NavLink to="/" className={linkStyle}>
+          Home
+        </NavLink>
 
-        {!token && (
-          <>
-            <NavLink to="/login" className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg font-bold text-black text-xs transition ml-2">Login</NavLink>
-            {/* <NavLink
-              to="/signup"
-              className="bg-cyan-500 hover:bg-cyan-600 px-4 py-2 rounded-lg font-bold text-black text-xs transition ml-2"
-            >
-              Sign Up
-            </NavLink> */}
-          </>
+        {token && (
+          <NavLink to="/camera" className={linkStyle}>
+            Dashboard
+          </NavLink>
         )}
 
-        {/* USER PROFILE AVATAR & DROPDOWN */}
         {token && (
+          <NavLink to="/cameras" className={linkStyle}>
+            Cameras
+          </NavLink>
+        )}
+
+
+        {token && (
+          <NavLink to="/recordings" className={linkStyle}>
+            Recordings
+          </NavLink>
+        )}
+
+        {token && (
+          <NavLink to="/alerts" className={linkStyle}>
+            Alerts
+          </NavLink>
+        )}
+
+        <NavLink to="/about" className={linkStyle}>
+          About
+        </NavLink>
+
+        {!token ? (
+          <NavLink
+            to="/login"
+            className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-xl font-semibold shadow-lg transition-all duration-300 cursor-pointer"
+          >
+            Login
+          </NavLink>
+        ) : (
           <div className="relative ml-4">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-9 h-9 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold flex items-center justify-center text-sm border-2 border-cyan-300 shadow-md cursor-pointer transition"
+              className="w-10 h-10 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold flex items-center justify-center border border-cyan-300 transition cursor-pointer"
             >
               {getAvatarLetter()}
             </button>
@@ -99,14 +139,21 @@ export default function Navbar() {
                   className="fixed inset-0 z-10"
                   onClick={() => setDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-3 w-56 bg-[#0f172a] border border-gray-700 rounded-xl shadow-2xl z-20 py-2 animate-fade-in text-sm">
-                  <div className="px-4 py-3 border-b border-gray-800">
-                    <p className="text-gray-200 font-semibold truncate">{user?.name || "User"}</p>
-                    <p className="text-gray-500 text-xs truncate mt-0.5">{user?.email || "Active Session"}</p>
+
+                <div className="absolute right-0 mt-3 w-56 bg-slate-900 border border-slate-700 rounded-xl shadow-xl z-20 py-2">
+                  <div className="px-4 py-3 border-b border-slate-700">
+                    <p className="text-white font-semibold truncate">
+                      {user?.name || "User"}
+                    </p>
+
+                    <p className="text-slate-400 text-xs truncate">
+                      {user?.email || "Active Session"}
+                    </p>
                   </div>
+
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-red-500/10 text-red-400 font-medium transition cursor-pointer"
+                    className="w-full text-left px-4 py-2 text-red-400 hover:bg-red-500/10 transition cursor-pointer"
                   >
                     🚪 Sign Out
                   </button>
@@ -117,73 +164,121 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* MOBILE MENU ICON */}
+      {/* MOBILE MENU BUTTON */}
       <div className="md:hidden flex items-center gap-4">
+
         {token && (
-          <div className="w-8 h-8 rounded-full bg-cyan-500 text-black font-extrabold flex items-center justify-center text-xs border border-cyan-300">
+          <div className="w-8 h-8 rounded-full bg-cyan-500 text-black font-bold flex items-center justify-center">
             {getAvatarLetter()}
           </div>
         )}
-        <button onClick={() => setOpen(true)} className="text-2xl cursor-pointer">
+
+        <button
+          onClick={() => setOpen(true)}
+          className="text-2xl text-black"
+        >
           ☰
         </button>
+
       </div>
 
-      {/* OVERLAY (click outside to close) */}
+      {/* OVERLAY */}
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[110] md:hidden"
+          className="fixed inset-0 bg-black/60 z-[110] md:hidden"
         />
       )}
 
-      {/* MOBILE SIDE MENU */}
+      {/* MOBILE MENU */}
       <div
         ref={menuRef}
-        className="fixed md:hidden top-0 right-0 h-full w-72 bg-[#020617]/95 backdrop-blur-md border-l border-gray-800 shadow-2xl z-[120] translate-x-[100%]"
+        className="fixed md:hidden top-0 right-0 h-full w-72 bg-slate-900 border-l border-slate-700 shadow-2xl z-[120] translate-x-[100%]"
       >
-        {/* CLOSE BUTTON */}
-        <div className="flex justify-between items-center p-5 border-b border-gray-800">
-          <span className="text-cyan-400 font-bold">Menu</span>
+        <div className="flex justify-between items-center p-5 border-b border-slate-700">
+          <span className="text-cyan-400 font-bold">
+            Menu
+          </span>
+
           <button
             onClick={() => setOpen(false)}
-            className="text-2xl text-white cursor-pointer"
+            className="text-2xl text-white"
           >
             ✖
           </button>
         </div>
 
-        {/* MENU LINKS */}
-        <div className="flex flex-col mt-4 space-y-1 px-4">
-          <NavLink to="/" onClick={() => setOpen(false)} className={linkStyle}>Home</NavLink>
-          {token && <NavLink to="/camera" onClick={() => setOpen(false)} className={linkStyle}>Dashboard</NavLink>}
-          {token && <NavLink to="/recordings" onClick={() => setOpen(false)} className={linkStyle}>Recordings</NavLink>}
-          {token && <NavLink to="/alerts" onClick={() => setOpen(false)} className={linkStyle}>Alerts</NavLink>}
-          <NavLink to="/about" onClick={() => setOpen(false)} className={linkStyle}>About</NavLink>
+        <div className="flex flex-col mt-4 px-4">
 
-          {!token ? (
+          <NavLink
+            to="/"
+            onClick={() => setOpen(false)}
+            className="py-3 text-white"
+          >
+            Home
+          </NavLink>
+
+          {token && (
             <>
-              <div className="border-t border-gray-800 my-4" />
-              <NavLink to="/login" onClick={() => setOpen(false)} className={linkStyle}>Login</NavLink>
               <NavLink
-                to="/signup"
+                to="/camera"
                 onClick={() => setOpen(false)}
-                className="block text-center bg-cyan-500 hover:bg-cyan-600 px-4 py-2.5 rounded-lg font-bold text-black text-sm transition mt-2"
+                className="py-3 text-white"
               >
-                Sign Up
+                Dashboard
+              </NavLink>
+
+              <NavLink
+                to="/cameras"
+                onClick={() => setOpen(false)}
+                className="py-3 text-white"
+              >
+                Cameras
+              </NavLink>
+
+              <NavLink
+                to="/recordings"
+                onClick={() => setOpen(false)}
+                className="py-3 text-white"
+              >
+                Recordings
+              </NavLink>
+
+              <NavLink
+                to="/alerts"
+                onClick={() => setOpen(false)}
+                className="py-3 text-white"
+              >
+                Alerts
               </NavLink>
             </>
-          ) : (
-            <>
-              <div className="border-t border-gray-800 my-4" />
-              <button
-                onClick={handleLogout}
-                className="w-full text-center bg-red-600/20 hover:bg-red-600 hover:text-white text-red-400 py-2.5 rounded-lg text-sm font-semibold transition border border-red-500/20 cursor-pointer"
-              >
-                Sign Out
-              </button>
-            </>
           )}
+
+          <NavLink
+            to="/about"
+            onClick={() => setOpen(false)}
+            className="py-3 text-white"
+          >
+            About
+          </NavLink>
+
+          {!token ? (
+            <NavLink
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="mt-4 bg-cyan-500 text-black text-center py-2 rounded-lg font-semibold"
+            >
+              Login
+            </NavLink>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="mt-4 bg-red-600/20 text-red-400 py-2 rounded-lg"
+            >
+              Sign Out
+            </button>
+          )}
+
         </div>
       </div>
     </nav>

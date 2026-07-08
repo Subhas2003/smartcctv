@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 
 export default function About() {
   const containerRef = useRef(null);
-   const glowRef = useRef(null);
+  const glowRef = useRef(null);
 
   useEffect(() => {
     gsap.from(containerRef.current.children, {
@@ -13,52 +13,41 @@ export default function About() {
       duration: 1,
       ease: "power2.out",
     });
-     // Mouse glow movement
-    const moveGlow = (e) => {
-      gsap.to(glowRef.current, {
-        x: e.clientX - 150,
-        y: e.clientY - 150,
-        duration: 0.4,
-        ease: "power2.out",
-      });
-    };
-
-    window.addEventListener("mousemove", moveGlow);
-
-    return () => window.removeEventListener("mousemove", moveGlow);
-
   }, []);
-  
 
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-linear-to-b from-[#050d1f] to-[#020617] text-white px-10 py-20"
+      className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#ADAAF7] via-[#BEC3FF] to-[#D9F9DF] px-6 md:px-12 py-24"
     >
-         <div
+      {/* Glow Effect */}
+      <div
         ref={glowRef}
-        className="absolute w-[300px] h-[300px] bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"
-      ></div>
+        className="absolute top-40 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-cyan-300/20 rounded-full blur-3xl pointer-events-none"
+      />
+
       {/* Heading */}
-      <div className="text-center mb-14">
-        <h1 className="text-4xl font-bold mb-4">
+      <div className="relative z-10 text-center mb-16">
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
           About The Project
         </h1>
-        <p className="text-gray-400 max-w-2xl mx-auto">
+
+        <p className="text-slate-700 max-w-2xl mx-auto text-lg">
           Learn more about our intelligent warehouse surveillance system
           and the technologies powering it.
         </p>
       </div>
 
       {/* Content Cards */}
-      <div className="grid md:grid-cols-2 gap-10 max-w-6xl mx-auto">
+      <div className="relative z-10 grid md:grid-cols-2 gap-10 max-w-6xl mx-auto">
 
         {/* Key Features */}
-        <div className="bg-[#0f172a] border border-gray-700 p-8 rounded-2xl shadow-xl">
-          <h2 className="text-xl font-semibold mb-4 text-cyan-400">
+        <div className="bg-white/50 backdrop-blur-sm border border-white/40 p-8 rounded-3xl shadow-xl">
+          <h2 className="text-2xl font-semibold mb-5 text-slate-900">
             🔍 Key Features
           </h2>
-          <ul className="space-y-3 text-gray-300">
+
+          <ul className="space-y-3 text-slate-700">
             <li>• Real-time camera streaming</li>
             <li>• AI-based fire detection</li>
             <li>• Automatic alert system</li>
@@ -68,11 +57,12 @@ export default function About() {
         </div>
 
         {/* Technologies */}
-        <div className="bg-[#0f172a] border border-gray-700 p-8 rounded-2xl shadow-xl">
-          <h2 className="text-xl font-semibold mb-4 text-cyan-400">
+        <div className="bg-white/50 backdrop-blur-sm border border-white/40 p-8 rounded-3xl shadow-xl">
+          <h2 className="text-2xl font-semibold mb-5 text-slate-900">
             ⚙️ Technologies Used
           </h2>
-          <ul className="space-y-3 text-gray-300">
+
+          <ul className="space-y-3 text-slate-700">
             <li>• Raspberry Pi Zero W</li>
             <li>• Python + OpenCV</li>
             <li>• YOLO / MobileNet</li>
@@ -85,11 +75,12 @@ export default function About() {
       </div>
 
       {/* Objective Section */}
-      <div className="max-w-4xl mx-auto mt-16 bg-[#0f172a] border border-gray-700 p-8 rounded-2xl shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 text-cyan-400">
+      <div className="relative z-10 max-w-5xl mx-auto mt-16 bg-white/50 backdrop-blur-sm border border-white/40 p-8 rounded-3xl shadow-xl">
+        <h2 className="text-2xl font-semibold mb-5 text-slate-900">
           🎯 Project Objective
         </h2>
-        <p className="text-gray-300 leading-relaxed">
+
+        <p className="text-slate-700 leading-relaxed text-lg">
           The primary goal of this system is to create a cost-effective,
           AI-driven surveillance solution capable of detecting fire and
           monitoring warehouse environments in real-time. The system

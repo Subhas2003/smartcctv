@@ -171,117 +171,160 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050d1f] to-[#020617] flex items-center justify-center px-6 text-white">
-      <div
-        ref={cardRef}
-        className="w-full max-w-md bg-[#0f172a] border border-gray-700 rounded-2xl p-10 shadow-2xl text-center"
-      >
-        {status === "success" ? (
-          <div>
-            <div className="mb-6 flex justify-center">
-              <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 text-3xl">
-                ✔️
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-3">Activated!</h1>
-            <p className="text-gray-400 mb-8 text-sm leading-relaxed">{message}</p>
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full bg-cyan-500 hover:bg-cyan-600 transition py-3 rounded-lg font-semibold text-black cursor-pointer text-center"
-            >
-              Sign In →
-            </button>
+   <div className="min-h-screen bg-gradient-to-b from-[#ADAAF7] via-[#BEC3FF] to-[#D9F9DF] flex items-center justify-center px-6">
+
+  <div
+    ref={cardRef}
+    className="w-full max-w-md bg-white/50 backdrop-blur-sm border border-white/40 rounded-3xl p-10 shadow-2xl text-center"
+  >
+
+    {status === "success" ? (
+      <div>
+
+        <div className="mb-6 flex justify-center">
+          <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-400 rounded-full flex items-center justify-center text-emerald-600 text-3xl">
+            ✔️
           </div>
-        ) : (
-          <div>
-            {/* Header */}
-            <div className="mb-6 flex justify-center">
-              <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-500/30 rounded-full flex items-center justify-center text-cyan-400 text-3xl">
-                🔑
-              </div>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-3">Verification Code</h1>
-            <p className="text-gray-400 text-sm mb-8">
-              We've sent a 6-digit verification code to <br />
-              <span className="text-cyan-400 font-semibold break-all">{email || "your email address"}</span>
-            </p>
+        </div>
 
-            {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-400 p-3 rounded-lg text-sm mb-6">
-                {error}
-              </div>
-            )}
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          Activated!
+        </h1>
 
-            {message && (
-              <div className="bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 p-3 rounded-lg text-sm mb-6">
-                {message}
-              </div>
-            )}
+        <p className="text-slate-600 mb-8 text-sm leading-relaxed">
+          {message}
+        </p>
 
-            {previewUrl && (
-              <div className="bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 p-4 rounded-lg text-sm mb-6">
-                <p className="font-semibold mb-1">🧪 Test Environment Mail Box:</p>
-                <a
-                  href={previewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-bold hover:text-cyan-200"
-                >
-                  Open Ethereal Mailbox →
-                </a>
-              </div>
-            )}
+        <button
+          onClick={() => navigate("/login")}
+          className="w-full bg-slate-900 hover:bg-slate-800 transition py-3 rounded-xl font-semibold text-white cursor-pointer text-center"
+        >
+          Sign In →
+        </button>
 
-            {/* OTP input boxes */}
-            <form onSubmit={handleVerify}>
-              <div className="flex justify-between gap-2 mb-8" onPaste={handlePaste}>
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={inputRefs[index]}
-                    type="text"
-                    pattern="\d*"
-                    maxLength={1}
-                    value={digit}
-                    onChange={(e) => handleChange(e, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    className="w-12 h-14 text-center text-xl font-bold bg-[#020617] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors duration-200"
-                    disabled={status === "loading"}
-                  />
-                ))}
-              </div>
+      </div>
+    ) : (
+      <div>
 
-              <button
-                type="submit"
-                className="w-full bg-cyan-500 hover:bg-cyan-600 transition py-3 rounded-lg font-semibold text-black cursor-pointer disabled:opacity-50 mb-6"
-                disabled={status === "loading"}
-              >
-                {status === "loading" ? "Verifying..." : "Verify Code →"}
-              </button>
-            </form>
+        {/* Header */}
+        <div className="mb-6 flex justify-center">
+          <div className="w-16 h-16 bg-cyan-500/10 border border-cyan-400 rounded-full flex items-center justify-center text-cyan-600 text-3xl">
+            🔑
+          </div>
+        </div>
 
-            <div className="text-gray-400 text-sm flex flex-col gap-2 items-center">
-              <div>
-                Didn't receive code?{" "}
-                {cooldown > 0 ? (
-                  <span className="text-cyan-400 font-semibold">Resend in {cooldown}s</span>
-                ) : (
-                  <button
-                    onClick={handleResend}
-                    className="text-cyan-400 font-semibold hover:underline cursor-pointer bg-transparent border-none p-0 inline disabled:opacity-50"
-                    disabled={resendLoading}
-                  >
-                    {resendLoading ? "Sending..." : "Resend Code"}
-                  </button>
-                )}
-              </div>
-              <Link to="/login" className="text-cyan-400 hover:underline mt-2">
-                Back to Sign In
-              </Link>
-            </div>
+        <h1 className="text-3xl font-bold text-slate-900 mb-3">
+          Verification Code
+        </h1>
+
+        <p className="text-slate-600 text-sm mb-8">
+          We've sent a 6-digit verification code to <br />
+          <span className="text-cyan-600 font-semibold break-all">
+            {email || "your email address"}
+          </span>
+        </p>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-400 text-red-600 p-3 rounded-lg text-sm mb-6">
+            {error}
           </div>
         )}
+
+        {message && (
+          <div className="bg-emerald-500/10 border border-emerald-400 text-emerald-600 p-3 rounded-lg text-sm mb-6">
+            {message}
+          </div>
+        )}
+
+        {previewUrl && (
+          <div className="bg-cyan-500/10 border border-cyan-400 text-cyan-700 p-4 rounded-lg text-sm mb-6">
+
+            <p className="font-semibold mb-1">
+              🧪 Test Environment Mail Box:
+            </p>
+
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-bold hover:text-cyan-900"
+            >
+              Open Ethereal Mailbox →
+            </a>
+
+          </div>
+        )}
+
+        {/* OTP Inputs */}
+        <form onSubmit={handleVerify}>
+
+          <div
+            className="flex justify-between gap-2 mb-8"
+            onPaste={handlePaste}
+          >
+            {otp.map((digit, index) => (
+              <input
+                key={index}
+                ref={inputRefs[index]}
+                type="text"
+                pattern="\d*"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleChange(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)}
+                className="w-12 h-14 text-center text-xl font-bold bg-white border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-cyan-500 transition-colors duration-200"
+                disabled={status === "loading"}
+              />
+            ))}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-slate-900 hover:bg-slate-800 transition py-3 rounded-xl font-semibold text-white cursor-pointer disabled:opacity-50 mb-6"
+            disabled={status === "loading"}
+          >
+            {status === "loading"
+              ? "Verifying..."
+              : "Verify Code →"}
+          </button>
+
+        </form>
+
+        <div className="text-slate-600 text-sm flex flex-col gap-2 items-center">
+
+          <div>
+            Didn't receive code?{" "}
+            {cooldown > 0 ? (
+              <span className="text-cyan-600 font-semibold">
+                Resend in {cooldown}s
+              </span>
+            ) : (
+              <button
+                onClick={handleResend}
+                className="text-cyan-600 font-semibold hover:underline cursor-pointer bg-transparent border-none p-0 inline disabled:opacity-50"
+                disabled={resendLoading}
+              >
+                {resendLoading
+                  ? "Sending..."
+                  : "Resend Code"}
+              </button>
+            )}
+          </div>
+
+          <Link
+            to="/login"
+            className="text-cyan-600 hover:underline mt-2 font-medium"
+          >
+            Back to Sign In
+          </Link>
+
+        </div>
+
       </div>
-    </div>
+    )}
+
+  </div>
+
+</div>
   );
 }

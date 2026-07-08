@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Camera from "./pages/Camera";
+import Cameras from "./pages/Cameras";
+import CameraStream from "./pages/CameraStream";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import About from "./pages/About";
@@ -11,7 +13,7 @@ import Recordings from "./pages/Recordings";
 import Alerts from "./pages/Alerts";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import VerifyEmail from "./pages/VerifyEmail";
+import VerifyOtp from "./pages/VerifyOtp";
 import ResendVerification from "./pages/ResendVerification";
 import "./App.css";
 
@@ -26,6 +28,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Camera />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cameras"
+          element={
+            <ProtectedRoute>
+              <Cameras />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cameras/:id/stream"
+          element={
+            <ProtectedRoute>
+              <CameraStream />
             </ProtectedRoute>
           }
         />
@@ -50,11 +68,13 @@ export default function App() {
         />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email" element={<VerifyOtp />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} />
         <Route path="/resend-verification" element={<ResendVerification />} />
       </Routes>
       <Footer />
     </BrowserRouter>
   );
 }
+
 

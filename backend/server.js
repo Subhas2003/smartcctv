@@ -5,6 +5,7 @@ import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
@@ -18,6 +19,7 @@ import { setStreamStatus } from "./controllers/cameraController.js";
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
 const server = http.createServer(app);
 
 // Connect to MongoDB
@@ -169,7 +171,71 @@ setInterval(async () => {
   }
 }, 10000);
 
+// Periodic task 3: User Cameras Stream Status Checker (Runs every 15 seconds)
+const checkUserCamerasStatus = async () => {
+  try {
+    const cameras = await Camera.find({ streamUrl: { $exists: true, $ne: "" } });
+
+    for (const camera of cameras) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout
+      let isOnline = false;
+
+      try {
+        const response = await fetch(camera.streamUrl, {
+          method: "HEAD",
+          signal: controller.signal,
+        }).catch(async () => {
+          return await fetch(camera.streamUrl, {
+            method: "GET",
+            signal: controller.signal,
+          });
+        });
+
+        clearTimeout(timeout);
+        controller.abort();
+        isOnline = response.status >= 200 && response.status < 400;
+      } catch (err) {
+        clearTimeout(timeout);
+        isOnline = false;
+      }
+
+      const newStatus = isOnline ? "Online" : "Offline";
+      if (camera.status !== newStatus) {
+        const oldStatus = camera.status;
+        camera.status = newStatus;
+        if (isOnline) {
+          camera.lastSeen = new Date();
+        }
+        await camera.save();
+        console.log(`User Camera [${camera.cameraName}] (${camera._id}) changed status from ${oldStatus} to ${newStatus}`);
+
+        // Broadcast to clients
+        io.emit("camera_status_changed", camera);
+
+        if (newStatus === "Offline") {
+          io.emit("critical_camera_offline", {
+            cameraId: camera._id.toString(),
+            name: camera.cameraName,
+            message: "Camera went offline: Stream unreachable",
+            timestamp: new Date(),
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error checking user camera streams:", error);
+  }
+};
+
+// Start the check after a 5 second delay to let server initialize
+setTimeout(() => {
+  checkUserCamerasStatus();
+  setInterval(checkUserCamerasStatus, 15000);
+}, 5000);
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

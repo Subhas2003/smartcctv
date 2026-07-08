@@ -2,15 +2,39 @@ import mongoose from "mongoose";
 
 const cameraSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    cameraName: {
+      type: String,
+      required: function () {
+        return !!this.userId;
+      },
+      trim: true,
+    },
+    location: {
+      type: String,
+      required: function () {
+        return !!this.userId;
+      },
+      trim: true,
+    },
+    streamUrl: {
+      type: String,
+      required: function () {
+        return !!this.userId;
+      },
+      trim: true,
+    },
     cameraId: {
       type: String,
-      required: true,
-      unique: true,
       trim: true,
+      unique: true,
+      sparse: true,
     },
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     status: {
@@ -44,5 +68,14 @@ const cameraSchema = new mongoose.Schema(
   }
 );
 
+// Synchronize legacy 'name' with 'cameraName' before saving
+cameraSchema.pre("save", function (next) {
+  if (this.cameraName && !this.name) {
+    this.name = this.cameraName;
+  }
+  next();
+});
+
 const Camera = mongoose.model("Camera", cameraSchema);
 export default Camera;
+

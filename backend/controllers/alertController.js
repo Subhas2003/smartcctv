@@ -35,6 +35,7 @@ export const getAlerts = async (req, res, next) => {
     if (search) {
       query.$or = [
         { cameraName: { $regex: search, $options: "i" } },
+        { location: { $regex: search, $options: "i" } },
         { type: { $regex: search, $options: "i" } },
         { notes: { $regex: search, $options: "i" } },
       ];
@@ -181,11 +182,21 @@ export const triggerAlert = async (req, res, next) => {
     // Save alert time
     lastAlertTimes.set(cooldownKey, now);
 
+    // Look up camera metadata
+    let finalCameraName = cameraName || "Main Camera";
+    let location = "Unknown";
+    const camera = await Camera.findOne({ cameraId });
+    if (camera) {
+      finalCameraName = camera.cameraName || camera.name || finalCameraName;
+      location = camera.location || location;
+    }
+
     // Save alert to database
     const alert = await Alert.create({
       type,
       cameraId,
-      cameraName,
+      cameraName: finalCameraName,
+      location,
       confidence,
       status: "Active",
     });
@@ -241,11 +252,13 @@ export const triggerFireAlert = async (req, res, next) => {
     // Save alert time
     lastAlertTimes.set(cooldownKey, now);
 
-    // Look up camera name if registered
+    // Look up camera name and location if registered
     let cameraName = "Camera " + cameraId;
+    let location = "Unknown";
     const camera = await Camera.findOne({ cameraId });
     if (camera) {
-      cameraName = camera.name;
+      cameraName = camera.cameraName || camera.name || cameraName;
+      location = camera.location || location;
     }
 
     // Save alert to database
@@ -253,6 +266,7 @@ export const triggerFireAlert = async (req, res, next) => {
       type: normalizedType,
       cameraId,
       cameraName,
+      location,
       confidence: normalizedConfidence,
       status: "Active",
     });

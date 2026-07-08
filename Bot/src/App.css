@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* @import url('https://api.fontshare.com/v2/css?f=satoshi@400,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f=nippo@200,300,400,500,600,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f=array@400&display=swap'); */
+/* @import "./array.css"; */
+/* @import "./font.css"; */
 @theme {
   --color-gray-50: oklch(0.984 0.003 247.858);
   --color-gray-100: oklch(0.968 0.007 247.896);
@@ -11,5 +16,18 @@
   --color-gray-800: oklch(0.279 0.041 260.031);
   --color-gray-900: oklch(0.208 0.042 265.755);
   --color-gray-950: oklch(0.129 0.042 264.695);
+  /* --font-poppins:  'Nippo';
+  --font-array: 'Array-Regular';
+  --font-array-width:'Array-Wide';
+  --font-Array-Semibold:'Array-Semibold';
+  --font-Array-SemiboldWide: 'Array-SemiboldWide';
+  --font-Array-BoldWide: 'Array-BoldWide';
+  --font-Array-Bold: 'Array-Bold'; */
+
 }
 /* oklch(42.4% 0.199 265.638) */
+
+
+
+
+

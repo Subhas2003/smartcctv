@@ -80,8 +80,12 @@ export default function Signup() {
     setLoading(true);
     setError("");
     try {
-      await loginWithGoogle(response.credential);
-      navigate("/camera");
+      const data = await loginWithGoogle(response.credential);
+      if (data && data.requiresOtp) {
+        navigate(`/verify-otp?email=${encodeURIComponent(data.email)}&flow=google`);
+      } else {
+        navigate("/camera");
+      }
     } catch (err) {
       setError(err.message || "Google sign-up failed");
     } finally {
@@ -120,7 +124,7 @@ export default function Signup() {
     try {
       const data = await signup(name, email, password);
       const previewParam = data.previewUrl ? `&previewUrl=${encodeURIComponent(data.previewUrl)}` : "";
-      navigate(`/verify-email?email=${encodeURIComponent(email)}${previewParam}`);
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}&flow=signup${previewParam}`);
     } catch (err) {
       setError(err.message || "Failed to create account");
     } finally {
@@ -129,116 +133,149 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#050d1f] to-[#020617] flex items-center justify-center px-6 text-white">
-      <div
-        ref={cardRef}
-        className="w-full max-w-md bg-[#0f172a] border border-gray-750 rounded-2xl p-6 sm:p-10 shadow-2xl my-8 mx-4"
-      >
-        {/* Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">Create Account</h1>
-          <p className="text-gray-400 mt-2">Join the surveillance system</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-[#ADAAF7] via-[#BEC3FF] to-[#D9F9DF] flex items-center justify-center px-6 mt-15">
 
-        {error && (
-          <div className="bg-red-500/20 border border-red-500/50 text-red-400 p-3 rounded-lg text-sm mb-6 text-center">
-            {error}
-          </div>
-        )}
+  <div
+    ref={cardRef}
+    className="w-full max-w-md bg-white/50 backdrop-blur-sm border border-white/40 rounded-3xl p-6 sm:p-10 shadow-2xl my-8 mx-4"
+  >
 
-        <form onSubmit={handleSignup}>
-          {/* Name */}
-          <label className="text-sm text-gray-300 block mb-2">Full Name</label>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full mb-5 px-4 py-3 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:border-cyan-500"
-            disabled={loading}
-          />
+    {/* Title */}
+    <div className="text-center mb-8">
+      <h1 className="text-3xl font-bold text-slate-900">
+        Create Account
+      </h1>
 
-          {/* Email */}
-          <label className="text-sm text-gray-300 block mb-2">Email Address</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-5 px-4 py-3 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:border-cyan-500"
-            disabled={loading}
-          />
-
-          {/* Password */}
-          <label className="text-sm text-gray-300 block mb-2">Password</label>
-          <div className="relative mb-5">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 pr-12 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:border-cyan-500"
-              disabled={loading}
-            />
-            <span
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
-            >
-              {showPassword ? "🙈" : "👁"}
-            </span>
-          </div>
-
-          {/* Confirm Password */}
-          <label className="text-sm text-gray-300 block mb-2">Confirm Password</label>
-          <div className="relative mb-6">
-            <input
-              type={showConfirm ? "text" : "password"}
-              placeholder="••••••••"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              className="w-full px-4 py-3 pr-12 rounded-lg bg-[#020617] border border-gray-700 text-white focus:outline-none focus:border-cyan-500"
-              disabled={loading}
-            />
-            <span
-              onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-400"
-            >
-              {showConfirm ? "🙈" : "👁"}
-            </span>
-          </div>
-
-          {/* CREATE ACCOUNT BUTTON */}
-          <button
-            type="submit"
-            className="w-full bg-cyan-500 hover:bg-cyan-600 transition py-3 rounded-lg font-semibold text-black cursor-pointer disabled:opacity-50"
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Create Account →"}
-          </button>
-        </form>
-
-        <div className="relative flex py-4 items-center">
-          <div className="flex-grow border-t border-gray-700"></div>
-          <span className="flex-shrink mx-4 text-gray-500 text-xs uppercase">Or</span>
-          <div className="flex-grow border-t border-gray-700"></div>
-        </div>
-
-        {/* GOOGLE SIGNUP */}
-        <div className="flex flex-col gap-3 items-center justify-center w-full">
-          <div id="google-signup-btn" className="w-full flex justify-center"></div>
-
-
-        </div>
-
-        {/* Bottom link */}
-        <p className="text-center text-gray-400 text-sm mt-6">
-          Already have an account?{" "}
-          <Link to="/login" className="text-cyan-400 hover:underline">
-            Sign in
-          </Link>
-        </p>
-      </div>
+      <p className="text-slate-600 mt-2">
+        Join the surveillance system
+      </p>
     </div>
+
+    {error && (
+      <div className="bg-red-500/10 border border-red-400 text-red-600 p-3 rounded-lg text-sm mb-6 text-center">
+        {error}
+      </div>
+    )}
+
+    <form onSubmit={handleSignup}>
+
+      {/* Name */}
+      <label className="text-sm text-slate-700 block mb-2">
+        Full Name
+      </label>
+
+      <input
+        type="text"
+        placeholder="Your name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="w-full mb-5 px-4 py-3 rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-cyan-500"
+        disabled={loading}
+      />
+
+      {/* Email */}
+      <label className="text-sm text-slate-700 block mb-2">
+        Email Address
+      </label>
+
+      <input
+        type="email"
+        placeholder="you@example.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full mb-5 px-4 py-3 rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-cyan-500"
+        disabled={loading}
+      />
+
+      {/* Password */}
+      <label className="text-sm text-slate-700 block mb-2">
+        Password
+      </label>
+
+      <div className="relative mb-5">
+        <input
+          type={showPassword ? "text" : "password"}
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-3 pr-12 rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-cyan-500"
+          disabled={loading}
+        />
+
+        <span
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500"
+        >
+          {showPassword ? "🙈" : "👁"}
+        </span>
+      </div>
+
+      {/* Confirm Password */}
+      <label className="text-sm text-slate-700 block mb-2">
+        Confirm Password
+      </label>
+
+      <div className="relative mb-6">
+        <input
+          type={showConfirm ? "text" : "password"}
+          placeholder="••••••••"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          className="w-full px-4 py-3 pr-12 rounded-lg bg-white border border-slate-300 text-slate-800 focus:outline-none focus:border-cyan-500"
+          disabled={loading}
+        />
+
+        <span
+          onClick={() => setShowConfirm(!showConfirm)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500"
+        >
+          {showConfirm ? "🙈" : "👁"}
+        </span>
+      </div>
+
+      {/* CREATE ACCOUNT BUTTON */}
+      <button
+        type="submit"
+        className="w-full bg-slate-900 hover:bg-slate-800 transition py-3 rounded-xl font-semibold text-white cursor-pointer disabled:opacity-50"
+        disabled={loading}
+      >
+        {loading ? "Creating Account..." : "Create Account →"}
+      </button>
+
+    </form>
+
+    <div className="relative flex py-4 items-center">
+      <div className="flex-grow border-t border-slate-300"></div>
+
+      <span className="flex-shrink mx-4 text-slate-500 text-xs uppercase">
+        Or
+      </span>
+
+      <div className="flex-grow border-t border-slate-300"></div>
+    </div>
+
+    {/* GOOGLE SIGNUP */}
+    <div className="flex flex-col gap-3 items-center justify-center w-full">
+      <div
+        id="google-signup-btn"
+        className="w-full flex justify-center"
+      ></div>
+    </div>
+
+    {/* Bottom Link */}
+    <p className="text-center text-slate-600 text-sm mt-6">
+      Already have an account?{" "}
+      <Link
+        to="/login"
+        className="text-cyan-600 hover:underline font-medium"
+      >
+        Sign in
+      </Link>
+    </p>
+
+  </div>
+
+</div>
   );
 }
 

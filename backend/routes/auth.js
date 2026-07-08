@@ -8,6 +8,8 @@ import {
   getProfile,
   verifyEmail,
   resendVerification,
+  verifyOtp,
+  resendOtp,
 } from "../controllers/authController.js";
 import protect from "../middleware/authMiddleware.js";
 import { validateSignup, validateLogin } from "../middleware/validationMiddleware.js";
@@ -21,6 +23,8 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-verification", resendVerification);
+router.post("/verify-otp", verifyOtp);
+router.post("/resend-otp", resendOtp);
 router.get("/profile", protect, getProfile);
 
 export default router;

@@ -17,6 +17,11 @@ const alertSchema = new mongoose.Schema(
       default: "Main Camera",
       trim: true,
     },
+    location: {
+      type: String,
+      default: "Unknown",
+      trim: true,
+    },
     confidence: {
       type: Number,
       required: [true, "Confidence score is required"],
