@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import SoftwareArchitecture from "../components/SoftwareArchitecture";
+import SoftwareArchitecture from "./softwareArchitecture.jsx";
 import HardwareArchitecture from "../components/hardwareArchitecture"
 import MehanicaArchitecture from "../components/mechanicalArchitecture"
 
