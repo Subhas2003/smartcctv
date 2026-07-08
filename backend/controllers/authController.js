@@ -226,7 +226,8 @@ export const forgotPassword = async (req, res, next) => {
     await user.save();
 
     // Send email
-    const resetUrl = `${process.env.FRONTEND_URL || "http://aiwatchpatrol.netlify.app"}/reset-password?token=${resetToken}`;
+    const frontendUrl = (process.env.FRONTEND_URL || "https://aiwatchpatrol.netlify.app").replace(/\/$/, "");
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
     
     // Send email in the background without blocking the HTTP response
     sendResetEmail(user.email, resetUrl).catch((err) => {
