@@ -1,8 +1,8 @@
-# Smart AI CCTV Surveillance System
+# Smart AI Powerd self Balance Surveillance Roboot
 
 ## Overview
 
-The Smart AI CCTV Surveillance System is a full-stack surveillance platform that integrates Raspberry Pi, Artificial Intelligence, Cloud Storage, and a MERN (MongoDB, Express.js, React.js, Node.js) web application. The system provides secure user authentication, real-time CCTV monitoring, cloud-based video storage, and remote accessibility through a modern web dashboard.
+The  AI-Powered Self Balance Surveillance Robot is a full-stack surveillance platform that integrates Raspberry Pi, Artificial Intelligence, Cloud Storage, and a MERN (MongoDB, Express.js, React.js, Node.js) web application. The system provides secure user authentication, real-time CCTV monitoring, cloud-based video storage, and remote accessibility through a modern web dashboard.
 
 ---
 
