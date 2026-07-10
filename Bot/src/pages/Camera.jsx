@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { socket, connectSocket, disconnectSocket } from "../services/socket";
+import { NotificationContext } from "../context/NotificationContext";
+import { socket, connectSocket } from "../services/socket";
 import CameraFeed from "../components/CameraFeed";
-import alarmSound from "../assets/sound/alarm.mp3";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Camera() {
@@ -28,41 +28,11 @@ export default function Camera() {
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [recentRecordings, setRecentRecordings] = useState([]);
 
-  // Alert Popup/Toast & Audio Alarm
-  const [activePopup, setActivePopup] = useState(null);
-  const [soundEnabled, setSoundEnabled] = useState(false);
-  const audioRef = useRef(null);
+  const { soundEnabled, setSoundEnabled } = useContext(NotificationContext);
 
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-  // Request browser notification permission
-  useEffect(() => {
-    if ("Notification" in window) {
-      if (Notification.permission === "default") {
-        Notification.requestPermission();
-      }
-    }
-  }, []);
 
-  const triggerBrowserNotification = (title, message) => {
-    if ("Notification" in window && Notification.permission === "granted") {
-      const notif = new Notification(title, {
-        body: message,
-        icon: "/vite.svg",
-      });
-      notif.onclick = () => {
-        window.focus();
-        navigate("/alerts");
-      };
-    }
-  };
-
-  const playAlarm = () => {
-    if (soundEnabled && audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play().catch((err) => console.log("Audio play blocked", err));
-    }
-  };
 
   // Fetch initial data
   const fetchDashboardData = async () => {
@@ -130,13 +100,14 @@ export default function Camera() {
     // Socket.IO Setup
     connectSocket();
 
-    // Listeners
-    socket.on("stream_status_changed", (data) => {
+    // Named handlers — IMPORTANT: must use named references so socket.off()
+    // only removes THIS page's listeners, not the global NotificationContext listeners.
+    const handleStreamStatus = (data) => {
       setStreamOnline(data.online);
       setStreamLastSeen(data.lastSeen);
-    });
+    };
 
-    socket.on("camera_status_changed", (updatedCamera) => {
+    const handleCameraStatus = (updatedCamera) => {
       setCameras((prev) =>
         prev.map((c) => (c._id === updatedCamera._id ? updatedCamera : c))
       );
@@ -146,51 +117,38 @@ export default function Camera() {
         }
         return prev;
       });
-    });
+    };
 
-    socket.on("new_alert", (alert) => {
-      // Prepend to list
+    const handleNewAlertDashboard = (alert) => {
+      // Update dashboard table & counters only — popup is handled globally by NotificationContext
       setRecentAlerts((prev) => [alert, ...prev.slice(0, 9)]);
-      
-      // Update counters
       setAlertStats((prev) => ({
         ...prev,
         total: prev.total + 1,
         active: prev.active + 1,
         today: prev.today + 1,
       }));
+    };
 
-      // In-app alert popup
-      const isCritical = alert.type === "Fire" || alert.type === "Smoke";
-      const icon = alert.type === "Fire" ? "🔥" : alert.type === "Smoke" ? "💨" : alert.type === "Person" ? "👤" : "🏃‍♂️";
-      
-      setActivePopup({
-        title: `${icon} ${alert.type} Detected`,
-        message: `Camera: ${alert.cameraName} | Location: ${alert.location || "Unknown"} | Confidence: ${alert.confidence}%`,
-        type: isCritical ? "critical" : "info",
-        timestamp: alert.timestamp,
-      });
-
-      // Play alarm if Fire/Smoke
-      if (isCritical) {
-        playAlarm();
-        triggerBrowserNotification(`${icon} CRITICAL ALERT`, `${alert.type} detected at ${alert.cameraName} - ${alert.location || "Unknown"} (${alert.confidence}% confidence)`);
-      }
-    });
-
-    socket.on("alert_updated", () => {
+    const handleAlertUpdated = () => {
       // Refresh list to sync resolved status
       fetchDashboardData();
-    });
+    };
+
+    socket.on("stream_status_changed", handleStreamStatus);
+    socket.on("camera_status_changed", handleCameraStatus);
+    socket.on("new_alert", handleNewAlertDashboard);
+    socket.on("alert_updated", handleAlertUpdated);
 
     return () => {
-      socket.off("stream_status_changed");
-      socket.off("camera_status_changed");
-      socket.off("new_alert");
-      socket.off("alert_updated");
-      disconnectSocket();
+      // Pass the exact callback reference — only removes THIS page's listeners,
+      // NOT the global popup listener in NotificationContext.
+      socket.off("stream_status_changed", handleStreamStatus);
+      socket.off("camera_status_changed", handleCameraStatus);
+      socket.off("new_alert", handleNewAlertDashboard);
+      socket.off("alert_updated", handleAlertUpdated);
     };
-  }, [soundEnabled]);
+  }, []);
 
   const handleResolveAlert = async (id) => {
     try {
@@ -228,37 +186,7 @@ export default function Camera() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ADAAF7] via-[#BEC3FF] to-[#D9F9DF] text-slate-900 px-4 md:px-10 py-20">
       
-      {/* Audio Element */}
-      {/* <audio ref={audioRef} src={alarmSound} loop /> */}
 
-      {/* Real-time Toast/Popup Alert */}
-      {activePopup && (
-        <div className={`fixed bottom-6 right-6 z-50 p-5 rounded-2xl shadow-2xl border flex flex-col gap-2 max-w-sm w-full animate-slide-up ${
-          activePopup.type === "critical"
-            ? "bg-red-950/90 border-red-500 text-white"
-            : "bg-slate-900/90 border-cyan-500 text-white"
-        }`}>
-          <div className="flex justify-between items-start">
-            <h3 className="font-bold text-lg">{activePopup.title}</h3>
-            <button
-              onClick={() => {
-                setActivePopup(null);
-                if (audioRef.current) audioRef.current.pause();
-              }}
-              className="text-gray-400 hover:text-white font-extrabold cursor-pointer"
-            >
-              ✖
-            </button>
-          </div>
-          <p className="text-sm opacity-90">{activePopup.message}</p>
-          <div className="flex justify-between items-center text-xs opacity-70 mt-2">
-            <span>{new Date(activePopup.timestamp).toLocaleTimeString()}</span>
-            {activePopup.type === "critical" && (
-              <span className="font-bold uppercase tracking-wider text-red-400 animate-pulse">Critical Danger</span>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* DASHBOARD HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8 mt-4">

@@ -49,7 +49,7 @@ export default function Navbar() {
   const getAvatarLetter = () => {
     if (user?.name) return user.name[0].toUpperCase();
     if (user?.email) return user.email[0].toUpperCase();
-    return "U";
+    return "";
   };
 
   const linkStyle = ({ isActive }) =>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import { NotificationProvider } from "./context/NotificationContext";
 import Home from "./pages/Home";
 import Camera from "./pages/Camera";
 import Cameras from "./pages/Cameras";
@@ -20,8 +21,9 @@ import "./App.css";
 export default function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <Routes>
+      <NotificationProvider>
+        <Navbar />
+        <Routes>
         <Route path="/" element={<Home />} />
         <Route
           path="/camera"
@@ -73,6 +75,7 @@ export default function App() {
         <Route path="/resend-verification" element={<ResendVerification />} />
       </Routes>
       <Footer />
+      </NotificationProvider>
     </BrowserRouter>
   );
 }

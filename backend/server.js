@@ -43,19 +43,19 @@ app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps, curl, or postman)
     if (!origin) return callback(null, true);
-    
+
     // Check if origin is explicitly allowed
     if (allowedOrigins.includes(origin) || allowedOrigins.includes(origin + "/")) {
       return callback(null, true);
     }
-    
+
     // Fallback: Dynamically allow any netlify.app or vercel.app subdomain for deployment flexibility
-    const isDeployDomain = origin.endsWith("netlify.app") || origin.endsWith("vercel.app") || 
-                           origin.includes(".netlify.app") || origin.includes(".vercel.app");
+    const isDeployDomain = origin.endsWith("netlify.app") || origin.endsWith("vercel.app") ||
+      origin.includes(".netlify.app") || origin.includes(".vercel.app");
     if (isDeployDomain) {
       return callback(null, true);
     }
-    
+
     return callback(new Error("Not allowed by CORS"), false);
   },
   credentials: true,
@@ -96,7 +96,7 @@ app.set("io", io);
 
 io.on("connection", (socket) => {
   console.log(`Socket client connected: ${socket.id}`);
-  
+
   socket.on("disconnect", () => {
     console.log(`Socket client disconnected: ${socket.id}`);
   });
@@ -106,7 +106,7 @@ io.on("connection", (socket) => {
 setInterval(async () => {
   try {
     const ninetySecondsAgo = new Date(Date.now() - 90000);
-    
+
     // Find all cameras that were active but haven't sent a heartbeat for > 90s
     const offlineCameras = await Camera.find({
       status: { $ne: "Offline" },
@@ -120,7 +120,7 @@ setInterval(async () => {
 
       // Broadcast camera offline update via Socket.IO
       io.emit("camera_status_changed", camera);
-      
+
       // Broadcast critical camera offline event for notification
       io.emit("critical_camera_offline", {
         cameraId: camera.cameraId,
@@ -144,10 +144,10 @@ const checkStreamStatus = async () => {
       signal: controller.signal,
     });
     clearTimeout(timeout);
-    
+
     // Immediately abort stream connection to avoid downloading indefinitely
     controller.abort();
-    
+
     const isOnline = response.status >= 200 && response.status < 400;
     return isOnline;
   } catch (error) {

@@ -4,6 +4,22 @@ export const AuthContext = createContext();
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
+const parseJwt = (token) => {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => {
     const stored = localStorage.getItem("token");
@@ -138,6 +154,47 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
   };
+
+  // Set up auto-logout timer based on JWT expiration
+  useEffect(() => {
+    if (!token || token === "undefined" || token === "null") return;
+
+    const decoded = parseJwt(token);
+    if (decoded && decoded.exp) {
+      const expirationTime = decoded.exp * 1000;
+      const timeLeft = expirationTime - Date.now();
+
+      if (timeLeft <= 0) {
+        console.warn("Session already expired. Logging out...");
+        logout();
+      } else {
+        const minutesLeft = Math.round(timeLeft / 1000 / 60);
+        console.log(`Session expires in ${minutesLeft} minutes.`);
+        const timer = setTimeout(() => {
+          console.warn("Session expired. Automatically logging out...");
+          logout();
+        }, timeLeft);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [token]);
+
+  // Global fetch interceptor to catch 401 Unauthorized errors and force logout
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 401 && localStorage.getItem("token")) {
+        console.warn("API returned 401 Unauthorized. Logging out...");
+        logout();
+      }
+      return response;
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []);
 
   return (
     <AuthContext.Provider

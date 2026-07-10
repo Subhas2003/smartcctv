@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { socket, connectSocket, disconnectSocket } from "../services/socket";
+import { socket, connectSocket } from "../services/socket";
 import { useNavigate } from "react-router-dom";
 import { gsap } from "gsap";
 
@@ -73,7 +73,6 @@ export default function Cameras() {
 
     return () => {
       socket.off("camera_status_changed");
-      disconnectSocket();
     };
   }, []);
 

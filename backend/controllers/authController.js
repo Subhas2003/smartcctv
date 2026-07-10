@@ -228,6 +228,7 @@ export const forgotPassword = async (req, res, next) => {
     // Send email
     const frontendUrl = (process.env.FRONTEND_URL || "https://aiwatchpatrol.netlify.app").replace(/\/$/, "");
     const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+    console.log(`[AUTH] Generated password reset link: ${resetUrl}`);
     
     // Send email in the background without blocking the HTTP response
     sendResetEmail(user.email, resetUrl).catch((err) => {
@@ -333,7 +334,7 @@ export const verifyOtp = async (req, res, next) => {
 
     // Generate JWT and log them in
     const token = signToken({ id: user._id });
-    res.cookie("token", token);
+    res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
 
     res.json({
       _id: user._id,

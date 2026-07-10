@@ -1,65 +1,35 @@
-// src/data/LiveStreamingArchitectureContent.jsx
+// src/data/MechanicalArchitectureContent.jsx
 
-export default function MehanicaArchitecture() {
+export default function MechanicalArchitectureContent() {
   return (
     <>
       <ul className="list-disc pl-6 space-y-4">
         <li>
-          The workflow begins on the Raspberry Pi local server, where the Pi
-          Camera continuously captures live video from the surveillance
-          environment and sends the video feed to a Flask-based streaming
-          server.
+          <strong>AI-Powered Smart Surveillance System (Left):</strong> This
+          stationary system is driven by a Raspberry Pi 4 and a Pi Camera
+          Module. It utilizes YOLOv5 machine learning models to detect specific
+          hazards—such as fires, tow trucks, falling objects, and helmet
+          violations. Data and alerts are stored in AWS S3 and displayed to
+          users via a MERN stack dashboard.
         </li>
 
         <li>
-          The Flask server processes the live video and generates an MJPEG video
-          stream that can be accessed locally through the Raspberry Pi using a
-          dedicated video feed endpoint.
+          <strong>Self-Balancing Autonomous Robot (Right):</strong> This mobile
+          unit is controlled by an ESP32-WROVER microcontroller. It maintains
+          its balance using an ICM-20948 IMU paired with a PID controller and
+          drives its motors via a Cytron MDD3A driver. For navigation and
+          safety, it uses HC-SR04 ultrasonic sensors for obstacle avoidance and
+          includes a Flysky FS-i6X receiver for optional remote control.
         </li>
 
         <li>
-          To enable remote access without exposing the Raspberry Pi directly to
-          the internet, Cloudflare Tunnel establishes a secure encrypted
-          connection between the local server and Cloudflare's network.
-        </li>
-
-        <li>
-          Cloudflare Tunnel generates a secure public URL, allowing external
-          devices to access the live video stream without requiring port
-          forwarding or public IP configuration.
-        </li>
-
-        <li>
-          The generated public stream URL is stored and managed by the backend
-          server developed using Node.js and Express.js.
-        </li>
-
-        <li>
-          The backend is responsible for camera management, stream URL storage,
-          API endpoints, user authentication, and communication with the
-          database.
-        </li>
-
-        <li>
-          The React frontend fetches camera information and stream URLs from the
-          backend and displays them through the web-based dashboard.
-        </li>
-
-        <li>
-          Users can navigate to the live streaming page, select available
-          cameras, and access real-time surveillance footage through the MERN
-          application.
-        </li>
-
-        <li>
-          The system provides centralized monitoring, allowing users to view
-          live streams from multiple cameras using a single dashboard interface.
-        </li>
-
-        <li>
-          This architecture enables secure live video streaming, remote camera
-          access, centralized management, and real-time surveillance monitoring
-          from any device connected to the internet.
+          <strong>
+            Integrated Smart Security & Monitoring Platform (Center/Bottom):
+          </strong>{" "}
+          Both the stationary surveillance network and the mobile robot feed
+          their data (real-time alerts, hazard detection, and path planning)
+          into this centralized platform to create a cohesive security and
+          monitoring ecosystem.
         </li>
       </ul>
     </>

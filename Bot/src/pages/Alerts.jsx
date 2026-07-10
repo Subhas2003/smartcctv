@@ -151,7 +151,7 @@ export default function Alerts() {
     </h1>
 
     <p className="text-center text-slate-700 mb-10 max-w-xl mx-auto">
-      Search and review historical detection events from the warehouse smart CCTV system.
+      Search and review historical detection events from the warehouse smart AI based Monitoring System.
     </p>
 
     {/* STATS OVERVIEW */}

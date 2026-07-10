@@ -3,66 +3,69 @@
 export default function HardwareArchitectureContent() {
   return (
     <>
-      <ul className="list-disc pl-6 space-y-4">
+      <ul className="list-disc pl-6 space-y-6">
         <li>
-          The workflow begins with the Pi Camera Module, which continuously
-          captures live video from the surveillance environment. The captured
-          video is divided into individual frames through the image capture
-          process for further analysis.
+          <strong>Processing Core</strong>
+
+          <ul className="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <strong>ESP32-WROVER Microcontroller:</strong> The heart of the
+              balancing system is a dual-core ESP32. It separates tasks to
+              maintain a strict real-time control loop: Core 0 handles the
+              time-critical PID balancing math, while Core 1 manages remote
+              control inputs and telemetry.
+            </li>
+          </ul>
         </li>
 
         <li>
-          The captured frames enter the preprocessing stage, where operations
-          such as resizing, format conversion, and normalization are performed
-          to prepare the images for AI-based processing.
+          <strong>Sensing & Signal Interface</strong>
+
+          <ul className="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <strong>Inertial Measurement Unit (IMU):</strong> It uses a
+              SparkFun ICM-20948 (9-axis) for tilt sensing. Rather than the
+              ESP32 doing the raw math, the IMU's onboard Digital Motion
+              Processor (DMP) handles the sensor fusion internally and streams
+              clean, fused digital pitch data directly to the ESP32 via an I2C
+              bus.
+            </li>
+
+            <li>
+              <strong>Ultrasonic Sensors:</strong> Three HC-SR04 sensors are
+              angled to provide a 270-degree field of view for obstacle
+              avoidance. Because these output a 5V signal and the ESP32 is only
+              3.3V tolerant, a passive voltage divider network is used on each
+              ECHO line to safely step down the analog logic levels.
+            </li>
+          </ul>
         </li>
 
         <li>
-          Each preprocessed frame is analyzed using the YOLOv5 Object Detection
-          Model, which detects objects such as people, vehicles, and other
-          relevant entities present in the scene.
-        </li>
+          <strong>Actuation & Power Management</strong>
 
-        <li>
-          After object detection, the Fire Detection ONNX Model processes the
-          frame to identify the presence of fire. Model files and configuration
-          settings such as confidence thresholds are loaded from local storage.
-        </li>
+          <ul className="list-disc pl-6 mt-3 space-y-2">
+            <li>
+              <strong>Motor Control:</strong> A Cytron MDD3A dual-channel
+              driver accepts 3.3V PWM signals directly from the ESP32 to
+              bidirectionally control the wheels.
+            </li>
 
-        <li>
-          Once detection is completed, the system annotates the frame by drawing
-          bounding boxes, labels, and detection information on the video stream.
-        </li>
+            <li>
+              <strong>Motors:</strong> The physical balancing and driving are
+              performed by two GB37 12V DC brushed gear motors operating at
+              200 RPM.
+            </li>
 
-        <li>
-          The processed frame is then used for two parallel operations:
-          <br />
-          • Live Video Streaming using Flask MJPEG Stream
-          <br />
-          • Video Recording using OpenCV VideoWriter
-        </li>
-
-        <li>
-          Recorded videos are automatically stored as 5-minute MP4 segments,
-          enabling efficient storage management and easier retrieval of
-          surveillance footage.
-        </li>
-
-        <li>
-          After a recording segment is completed, the system uploads the video
-          file to Amazon AWS S3 Cloud Storage for secure and reliable storage.
-        </li>
-
-        <li>
-          If the upload is successful, the local video file is automatically
-          deleted from the Raspberry Pi to free storage space and optimize
-          system performance.
-        </li>
-
-        <li>
-          This workflow provides real-time AI-based object and fire detection,
-          live video streaming, automated recording, cloud storage integration,
-          and centralized surveillance management through the web dashboard.
+            <li>
+              <strong>Power Supply:</strong> A 3S LiPo battery (11.1V) powers
+              the entire system. The raw 11.1V goes directly to the motor
+              driver, while an XL4015 Buck Converter steps the voltage down to
+              create a stable, isolated logic rail for the microcontrollers and
+              sensors. All components are tied to a single common ground to
+              prevent erratic signal noise.
+            </li>
+          </ul>
         </li>
       </ul>
     </>

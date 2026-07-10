@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import SoftwareArchitecture from "../components/SoftwareArchitecture";
-import HardwareArchitecture from "../components/hardwareArchitecture"
-import MehanicaArchitecture from "../components/mechanicalArchitecture"
+import SoftwareArchitecture from "./SoftwareArchitecture";
+import HardwareArchitecture from "./hardwareArchitecture"
+import MehanicaArchitecture from "./mechanicalArchitecture"
 
 const architectures = [
   {
@@ -17,7 +17,7 @@ const architectures = [
   },
   {
     name: "Mechanical Architecture",
-    image: "/image/mechanical.png",
+    image: "/image/mechanical.jpg",
     // description:
     //   "The mechanical architecture includes the self-balancing chassis, motor assembly, wheel system, camera mounting mechanism, protective body frame, and servo positioning system for stable operation.",
 
@@ -27,12 +27,13 @@ const architectures = [
   },
   {
     name: "Hardware Architecture",
-    image: "/image/hardware.jpeg",
+    image: "/image/hardware.jpg",
     // description:
     //   "The hardware architecture consists of Raspberry Pi Zero W, Pi Camera Module, ESP32 WROVER, ICM20948 sensor, BTS7960 motor driver, battery system, and wireless communication modules.",
 
      description:(
-      <HardwareArchitecture />
+     
+       <HardwareArchitecture />
     )
   },
 ];
