@@ -253,7 +253,7 @@ export const triggerFireAlert = async (req, res, next) => {
     lastAlertTimes.set(cooldownKey, now);
 
     // Look up camera name and location if registered
-    let cameraName = "Camera " + cameraId;
+    let cameraName =  cameraId;
     let location = "Unknown";
     const camera = await Camera.findOne({ cameraId });
     if (camera) {

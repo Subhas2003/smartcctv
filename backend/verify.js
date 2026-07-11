@@ -11,9 +11,8 @@ dotenv.config();
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/smartcctv_test";
 
 async function runTests() {
-  console.log("=========================================");
-  console.log("🚀 STARTING AUTOMATED SMART CCTV TESTS...");
-  console.log("=========================================");
+  console.log("STARTING AUTOMATED SMART CCTV TESTS...");
+ 
 
   try {
     // 1. Connect to Database
@@ -142,9 +141,7 @@ async function runTests() {
       throw new Error("Recording query verification failed.");
     }
 
-    console.log("=========================================");
-    console.log("🎉 ALL INTEGRATION TESTS PASSED SUCCESSFULLY!");
-    console.log("=========================================");
+    console.log("ALL INTEGRATION TESTS PASSED SUCCESSFULLY!");
   } catch (error) {
     console.error("❌ TEST RUNNER FAILURE:", error.message);
     process.exit(1);

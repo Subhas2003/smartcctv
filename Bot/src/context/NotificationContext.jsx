@@ -63,7 +63,7 @@ export const NotificationProvider = ({ children }) => {
 
       setActivePopup({
         title: `${icon} ${alert.type} Detected`,
-        message: `Camera: ${alert.cameraName} | Location: ${alert.location || "Unknown"} | Confidence: ${alert.confidence}%`,
+        message: `Camera: ${alert.cameraName}  | Confidence: ${alert.confidence}%`,
         type: isCritical ? "critical" : "info",
         timestamp: alert.timestamp,
       });

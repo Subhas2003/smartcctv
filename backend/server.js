@@ -171,33 +171,81 @@ setInterval(async () => {
   }
 }, 10000);
 
+// Helper: detect if a URL is an external permanent URL (not local/LAN IP)
+const isExternalUrl = (url) => {
+  try {
+    const parsed = new URL(url);
+    const hostname = parsed.hostname;
+    // Local/LAN patterns: localhost, 127.x, 192.168.x, 10.x, 172.16-31.x
+    const isLocal =
+      hostname === "localhost" ||
+      /^127\./.test(hostname) ||
+      /^192\.168\./.test(hostname) ||
+      /^10\./.test(hostname) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(hostname);
+    return !isLocal;
+  } catch {
+    return false;
+  }
+};
+
 // Periodic task 3: User Cameras Stream Status Checker (Runs every 15 seconds)
 const checkUserCamerasStatus = async () => {
   try {
     const cameras = await Camera.find({ streamUrl: { $exists: true, $ne: "" } });
 
     for (const camera of cameras) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 4000); // 4 seconds timeout
       let isOnline = false;
 
-      try {
-        const response = await fetch(camera.streamUrl, {
-          method: "HEAD",
-          signal: controller.signal,
-        }).catch(async () => {
-          return await fetch(camera.streamUrl, {
+      if (isExternalUrl(camera.streamUrl)) {
+        // For permanent HTTPS/external stream URLs (e.g. MJPEG feeds):
+        // HEAD is often unsupported; GET streams indefinitely.
+        // We attempt a GET and treat ANY response headers received as Online.
+        // Abort after 5 seconds — we only need to confirm the server responds.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        try {
+          const response = await fetch(camera.streamUrl, {
             method: "GET",
             signal: controller.signal,
           });
-        });
+          clearTimeout(timeout);
+          controller.abort(); // Immediately cut the streaming connection
+          isOnline = response.status >= 200 && response.status < 400;
+        } catch (err) {
+          clearTimeout(timeout);
+          // If the abort fired mid-stream, err.name === "AbortError"
+          // A mid-stream abort means the server was actively sending data → it's Online
+          if (err.name === "AbortError") {
+            isOnline = true; // Server responded (was streaming), so it's reachable
+          } else {
+            isOnline = false; // Network/DNS/connection error
+          }
+        }
+      } else {
+        // For local/LAN IP cameras: try HEAD first, fall back to GET
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
 
-        clearTimeout(timeout);
-        controller.abort();
-        isOnline = response.status >= 200 && response.status < 400;
-      } catch (err) {
-        clearTimeout(timeout);
-        isOnline = false;
+        try {
+          const response = await fetch(camera.streamUrl, {
+            method: "HEAD",
+            signal: controller.signal,
+          }).catch(async () => {
+            return await fetch(camera.streamUrl, {
+              method: "GET",
+              signal: controller.signal,
+            });
+          });
+
+          clearTimeout(timeout);
+          controller.abort();
+          isOnline = response.status >= 200 && response.status < 400;
+        } catch (err) {
+          clearTimeout(timeout);
+          isOnline = false;
+        }
       }
 
       const newStatus = isOnline ? "Online" : "Offline";

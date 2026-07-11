@@ -3,9 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const testGoogleLogin = async () => {
-  console.log("=========================================");
-  console.log("🧪 TESTING GOOGLE AUTH BACKEND ENDPOINT...");
-  console.log("=========================================");
+  console.log("TESTING GOOGLE AUTH BACKEND ENDPOINT...");
 
   // Create a mock JWT token payload
   const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");

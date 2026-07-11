@@ -361,7 +361,7 @@ export default function Camera() {
                       </td>
                       <td className="py-3.5 text-xs text-slate-700">
                         <div className="font-semibold">{alert.cameraName}</div>
-                        <div className="text-[10px] text-slate-500">Location: {alert.location || "Unknown"}</div>
+                        {/* <div className="text-[10px] text-slate-500">Location: {alert.location || "Unknown"}</div> */}
                       </td>
                       <td className="py-3.5">
                         <span className="bg-orange-500/15 text-orange-400 px-2 py-0.5 rounded text-xs font-bold">

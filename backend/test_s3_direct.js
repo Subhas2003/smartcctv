@@ -79,12 +79,10 @@ const runTest = async () => {
         throw new Error("Failed to sign URL.");
       }
     } else {
-      console.log("⚠️ S3 bucket appears to contain no recordings or matches.");
+      console.log("S3 bucket appears to contain no recordings or matches.");
     }
 
-    console.log("\n=========================================");
-    console.log("🎉 ALL STATELESS S3 TESTS PASSED SUCCESSFULLY!");
-    console.log("=========================================");
+    console.log("ALL STATELESS S3 TESTS PASSED SUCCESSFULLY!");
     process.exit(0);
   } catch (error) {
     console.error("❌ Test failed:", error);

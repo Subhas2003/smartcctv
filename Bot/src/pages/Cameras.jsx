@@ -97,7 +97,7 @@ export default function Cameras() {
     try {
       new URL(streamUrl);
     } catch (_) {
-      setError("Please enter a valid URL (e.g. http://192.168.1.100:8080/feed)");
+      setError("Please enter a valid URL (e.g. https://camera.smartcctv2026.me/video_feed)");
       return;
     }
 
@@ -233,7 +233,7 @@ export default function Cameras() {
               </button>
             </div>
             <p className="text-sm text-[#5D5A86] mb-6">
-              {isEditing ? "Update configuration settings for this camera." : "Register a local camera stream or IP camera URL."}
+              {isEditing ? "Update configuration settings for this camera." : "Register a permanent HTTPS stream URL or IP camera feed."}
             </p>
 
             {error && (
@@ -283,7 +283,7 @@ export default function Cameras() {
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. http://192.168.1.50:5000/stream"
+                  placeholder="e.g. https://camera.smartcctv2026.me/video_feed"
                   value={streamUrl}
                   onChange={(e) => setStreamUrl(e.target.value)}
                   disabled={formLoading}
