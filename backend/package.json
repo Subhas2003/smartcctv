@@ -5,8 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "npx nodemon server.js",
-    "test-fire": "node test_fire_alert.js"
+    "dev": "npx nodemon server.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.500.0",
