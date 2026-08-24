@@ -26,9 +26,9 @@ const decodeJwtPayload = (token) => {
   }
 };
 
-// @desc    Register a new user
-// @route   POST /api/auth/signup
-// @access  Public
+//Register a new user
+//POST /api/auth/signup
+//Public
 export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -70,9 +70,9 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
-// @desc    Authenticate user & get token
-// @route   POST /api/auth/login
-// @access  Public
+// Authenticate user & get token
+// POST /api/auth/login
+// Public
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -197,9 +197,9 @@ export const googleLogin = async (req, res, next) => {
   }
 };
 
-// @desc    Forgot Password - request email link
-// @route   POST /api/auth/forgot-password
-// @access  Public
+// Forgot Password - request email link
+// POST /api/auth/forgot-password
+// Public
 export const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
@@ -241,9 +241,9 @@ export const forgotPassword = async (req, res, next) => {
   }
 };
 
-// @desc    Reset Password
-// @route   POST /api/auth/reset-password
-// @access  Public
+// Reset Password
+// POST /api/auth/reset-password
+// Public
 export const resetPassword = async (req, res, next) => {
   try {
     const { token, password } = req.body;
@@ -281,9 +281,9 @@ export const resetPassword = async (req, res, next) => {
   }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/profile
-// @access  Private
+// Get current user profile
+// GET /api/auth/profile
+// Private
 export const getProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -296,9 +296,9 @@ export const getProfile = async (req, res, next) => {
   }
 };
 
-// @desc    Verify OTP code (Signup & Login)
-// @route   POST /api/auth/verify-otp
-// @access  Public
+// Verify OTP code (Signup & Login)
+// POST /api/auth/verify-otp
+// Public
 export const verifyOtp = async (req, res, next) => {
   try {
     const { email, code } = req.body;
@@ -350,9 +350,9 @@ export const verifyOtp = async (req, res, next) => {
   }
 };
 
-// @desc    Resend OTP code (Signup & Login)
-// @route   POST /api/auth/resend-otp
-// @access  Public
+//Resend OTP code (Signup & Login)
+// POST /api/auth/resend-otp
+// Public
 export const resendOtp = async (req, res, next) => {
   try {
     const { email } = req.body;
