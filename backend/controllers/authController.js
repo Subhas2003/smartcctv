@@ -53,7 +53,6 @@ export const registerUser = async (req, res, next) => {
       lastVerificationOtpSentAt: Date.now(),
     });
 
-    console.log(`[TESTING] Verification OTP for ${user.email}: ${rawOtp}`);
     
     // Send email in the background without blocking the HTTP response
     sendVerificationEmail(user.email, rawOtp).catch((err) => {
@@ -98,7 +97,6 @@ export const loginUser = async (req, res, next) => {
     user.lastVerificationOtpSentAt = Date.now();
     await user.save();
 
-    console.log(`[TESTING] Login OTP for ${user.email}: ${rawOtp}`);
 
     // Send email in the background
     sendVerificationEmail(user.email, rawOtp).catch((err) => {
@@ -184,7 +182,6 @@ export const googleLogin = async (req, res, next) => {
     user.lastVerificationOtpSentAt = Date.now();
     await user.save();
 
-    console.log(`[TESTING] Google Login OTP for ${user.email}: ${rawOtp}`);
 
     // Send email in the background
     sendVerificationEmail(user.email, rawOtp).catch((err) => {
@@ -334,7 +331,12 @@ export const verifyOtp = async (req, res, next) => {
 
     // Generate JWT and log them in
     const token = signToken({ id: user._id });
-    res.cookie("token", token, { maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie("token", token, { 
+      httpOnly:true,
+      secure:true,
+      sameSite:'strict',
+      maxAge: 24 * 60 * 60 * 1000 });
+      
 
     res.json({
       _id: user._id,
@@ -380,7 +382,6 @@ export const resendOtp = async (req, res, next) => {
 
     await user.save();
 
-    console.log(`[TESTING] Resent OTP for ${user.email}: ${rawOtp}`);
     
     // Send email in the background without blocking the HTTP response
     sendVerificationEmail(user.email, rawOtp).catch((err) => {
