@@ -244,6 +244,79 @@ Cloud Storage Access
 
 ---
 
+# Environment Variables
+
+The backend and frontend require a `.env` file with the following variables. **Never commit real values (API keys, secrets, credentials) to version control or share them publicly** — use a `.env.example` file with blank/placeholder values instead, and add `.env` to `.gitignore`.
+
+## Server Configuration
+
+| Variable | Description |
+|---|---|
+| `PORT` | Port the backend server runs on (e.g. `5000`) |
+| `FRONTEND_URL` | URL of the deployed/local frontend, used for CORS and redirects |
+
+## Database
+
+| Variable | Description |
+|---|---|
+| `MONGO_URI` | MongoDB Atlas connection string |
+
+## Authentication
+
+| Variable | Description |
+|---|---|
+| `JWT_SECRET` | Secret key used to sign and verify JWT tokens |
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID (used on the frontend/Vite build) |
+
+## AWS S3 (Cloud Video Storage)
+
+| Variable | Description |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | AWS IAM access key with S3 permissions |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM secret access key |
+| `AWS_REGION` | AWS region where the S3 bucket is hosted |
+| `AWS_S3_BUCKET` | Name of the S3 bucket used for storing recorded video segments |
+
+## Email / SMTP (OTP & Notifications)
+
+| Variable | Description |
+|---|---|
+| `SMTP_HOST` | SMTP server host (e.g. `smtp.gmail.com`) |
+| `SMTP_PORT` | SMTP server port (e.g. `587`) |
+| `SMTP_USER` | SMTP account email used to send OTP/notification emails |
+| `SMTP_PASS` | SMTP account password or app password |
+
+> If SMTP credentials are left empty, Nodemailer will auto-generate a test account for development purposes.
+
+## Optional / Transactional Email Service
+
+| Variable | Description |
+|---|---|
+| `RESEND_API_KEY` | API key for Resend, used as an alternative transactional email provider (optional) |
+
+### Example `.env.example`
+
+```dotenv
+PORT=5000
+MONGO_URI=
+JWT_SECRET=
+FRONTEND_URL=
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_S3_BUCKET=
+
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASS=
+
+VITE_GOOGLE_CLIENT_ID=
+```
+
+---
+
 # Installation
 
 ## Backend Setup
