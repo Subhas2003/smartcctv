@@ -19,9 +19,6 @@ export const registerHeartbeat = async (req, res, next) => {
     const {
       cameraId,
       name = "Main Camera",
-      cpuUsage = 0,
-      memoryUsage = 0,
-      temperature = 0,
       networkStatus = "Good",
     } = req.body;
 
@@ -45,18 +42,12 @@ export const registerHeartbeat = async (req, res, next) => {
         cameraId,
         name,
         status: computedStatus,
-        cpuUsage,
-        memoryUsage,
-        temperature,
         networkStatus,
         lastSeen: now,
       });
     } else {
       camera.name = name;
       camera.status = computedStatus;
-      camera.cpuUsage = cpuUsage;
-      camera.memoryUsage = memoryUsage;
-      camera.temperature = temperature;
       camera.networkStatus = networkStatus;
       camera.lastSeen = now;
       await camera.save();
